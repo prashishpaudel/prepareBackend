@@ -2,7 +2,7 @@
 //Database connections
 module.exports = {
 "prepare":{
- "host"     : 'localhost',
+ "host"     : '127.0.0.1',
     "user"     : 'root',
     "password" : 'uthti2010',
     "database" : 'prepare',
@@ -11,7 +11,7 @@ module.exports = {
 "prepare_db":{
  
     'connection': {
-        'host': 'localhost',
+        'host': '127.0.0.1',
         'user': 'root',
         'password': 'uthti2010',
 	"connectLimit": '10'
