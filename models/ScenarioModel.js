@@ -1398,7 +1398,7 @@ module.exports = {
 		try {
 
 
-			query = "SELECT CATEGORY as DISCIPLINE, SCENARIO_NAME as `SCENARIO NAME`, (TIME_DURATION/60) as 'TIME DURATION', scenario_id, course_id  FROM scenario where course_id = ? "
+			query = "SELECT CATEGORY as DISCIPLINE, SCENARIO_NAME as `SCENARIO NAME`, (TIME_DURATION/60) as 'TIME DURATION', scenario_id, course_id, LAST_TRAIN_DATE  FROM scenario where course_id = ? "
 
 			return pool.query(query, [inputdata.course_id], function (err, results) {
 
@@ -1496,5 +1496,24 @@ module.exports = {
 		} catch (e) {
 			return callback(e);
 		}
+	},
+	 //Save Scenario Training Info
+	 saveTrainingInfo: function (insertParams, callback) {
+		try {
+			const query = "UPDATE scenario SET LAST_TRAIN_DATE = NOW() WHERE SCENARIO_ID = ?";
+	
+			return pool.query(query, [insertParams.scenario_id], function (err, results) {
+				if (!err) {
+					return callback(null, results);
+				} else {
+					console.log(err);
+					return callback(err);
+				}
+			});
+		} catch (e) {
+			return callback(e);
+		}
 	}
+	
+	
 }

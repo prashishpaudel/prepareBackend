@@ -142,6 +142,12 @@ module.exports = function (app, passport) {
     //Delete Audio Stream
     app.delete('/deleteAudioStream/:Id', UserAuthentication.verify, DataRoute.deleteAudioStream)
 
+    // Get training authorization password
+    app.get('/trainAuthorization', DataRoute.trainAuthorization)
+
+    //Save Scenario Training Info
+    app.get('/saveTrainingInfo',DataRoute.saveTrainingInfo)
+
 
 };
 

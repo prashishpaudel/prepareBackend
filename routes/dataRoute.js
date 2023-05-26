@@ -1102,46 +1102,46 @@ module.exports = {
 
 	addEvent: function (req, res) {
 		try {
-		  if (req && req.body) {
-			var requiredFields = ['eventname', 'skilltype', 'specificskill', 'timestart', 'scenario_id', 'heart_rate', 'systolic_bp', 'diastolic_bp', 'spo2', 'r_rate', 'cardiac_rhythm', 'scenario_role_id', 'objectives1'];
-	  
-			// check if all required fields are present
-			requiredFields.forEach(function (str) {
-			  if (!req.body[str]) {
-				var err = new Error(str + ' is not present in the request body');
+			if (req && req.body) {
+				var requiredFields = ['eventname', 'skilltype', 'specificskill', 'timestart', 'scenario_id', 'heart_rate', 'systolic_bp', 'diastolic_bp', 'spo2', 'r_rate', 'cardiac_rhythm', 'scenario_role_id', 'objectives1'];
+
+				// check if all required fields are present
+				requiredFields.forEach(function (str) {
+					if (!req.body[str]) {
+						var err = new Error(str + ' is not present in the request body');
+						throw err;
+					}
+				});
+
+				// list of all fields (required + optional)
+				var allFields = requiredFields.concat(['lookupSynonyms']);
+
+				req.body.input = {};
+				// populate req.body.input with all fields (if present)
+				allFields.forEach(function (str) {
+					if (req.body[str]) {
+						req.body.input[str] = req.body[str];
+					}
+				});
+
+				return ScenarioControllers.addEvent(req.body.input, function (err, data) {
+					if (err) {
+						throw err;
+					}
+					return res.json(data);
+				});
+			} else {
+				var err = new Error('Request body is not present');
 				throw err;
-			  }
-			});
-	  
-			// list of all fields (required + optional)
-			var allFields = requiredFields.concat(['lookupSynonyms']);
-	  
-			req.body.input = {};
-			// populate req.body.input with all fields (if present)
-			allFields.forEach(function (str) {
-			  if (req.body[str]) {
-				req.body.input[str] = req.body[str];
-			  }
-			});
-	  
-			return ScenarioControllers.addEvent(req.body.input, function (err, data) {
-			  if (err) {
-				throw err;
-			  }
-			  return res.json(data);
-			});
-		  } else {
-			var err = new Error('Request body is not present');
-			throw err;
-		  }
+			}
 		} catch (e) {
-		  req.output = {};
-		  req.output.error = true;
-		  req.output.message = e.message;
-		  res.json(req.output);
+			req.output = {};
+			req.output.error = true;
+			req.output.message = e.message;
+			res.json(req.output);
 		}
-	  },
-	  
+	},
+
 
 
 	getEvent: function (request, response) {
@@ -1327,5 +1327,57 @@ module.exports = {
 			request.output.message = e.message;
 			response.json(request.output);
 		}
-	}
+	},
+
+	// Training Authorization Password:
+	trainAuthorization: function (request, response) {
+		const apiPassword = process.env.TRAIN_AUTHORIZATION_PASSWORD;  // assuming the password is stored as an environment variable
+
+		if (apiPassword) {
+			response.json({
+				success: true,
+				password: apiPassword
+			});
+		} else {
+			response.json({
+				success: false,
+				message: 'Password not found'
+			});
+		}
+	},
+
+	 //Save Scenario Training Info
+	saveTrainingInfo: function (request, response) {
+		try {
+			if (request && request.query) {
+				['scenario_id'].forEach(function (str) {
+					if (!request.query[str]) {
+						var err = new Error(str + ' is not present in the URL');
+						throw err;
+					}
+				});
+				request.input = {};
+				['scenario_id'].forEach(function (str) {
+					request.input[str] = request.query[str];
+				});
+	
+				return ScenarioControllers.saveTrainingInfo(request.input, function (err, data) {
+					if (err) {
+						throw err;
+					}
+					return response.json(data);
+				});
+			} else {
+				var err = new Error(' Query is not present in the URL');
+				throw err;
+			}
+		} catch (e) {
+			request.output = {}
+			request.output.error = true;
+			request.output.message = e.message;
+			response.json(request.output);
+		}
+	},
+	
+
 }

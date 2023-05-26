@@ -1895,5 +1895,24 @@ module.exports = {
 		}
 	},
 
+	
+	 //Save Scenario Training Info
+	saveTrainingInfo: function (inputdata, callback) {
+		try {
+			var insertParams = inputdata;
+			return ScenarioModel.saveTrainingInfo(insertParams, function (err, results) {
+				if (err) {
+					console.log(err);
+					throw err;
+				}
+				return callback(null, results);
+			});
+		} catch (e) {
+			console.log(e);
+			return callback(e);
+		}
+	}
+	
+
 
 }
