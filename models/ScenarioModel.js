@@ -1006,7 +1006,7 @@ module.exports = {
 			console.log(inputdata.objectives);
 
 			var query = "INSERT INTO events (SCENARIO_ID, EVENT_NAME, TIME_START, SKILL_TYPE, SPECIFIC_SKILL,HEART_RATE,SYSTOLIC_BP,DISTOLIC_BP,SPO2,R_RATE,CARDIAC_RYTHM,SCENARIO_ROLE_ID,OBJECTIVES,LOOKUP_WORDS_SYNONYMS) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-			return pool.query(query, [inputdata.scenario_id, inputdata.eventname, inputdata.timestart, inputdata.skilltype, inputdata.specificskill, inputdata.heart_rate, inputdata.systolic_bp, inputdata.diastolic_bp, inputdata.spo2, inputdata.r_rate, inputdata.cardiac_rhythm, inputdata.scenario_role_id, inputdata.objectives1,inputdata.lookupSynonyms], function (err, results) {
+			return pool.query(query, [inputdata.scenario_id, inputdata.eventname, inputdata.timestart, inputdata.skilltype, inputdata.specificskill, inputdata.heart_rate, inputdata.systolic_bp, inputdata.diastolic_bp, inputdata.spo2, inputdata.r_rate, inputdata.cardiac_rhythm, inputdata.scenario_role_id, inputdata.objectives1, inputdata.lookupSynonyms], function (err, results) {
 
 				if (!err) {
 					var ress = {
@@ -1497,11 +1497,11 @@ module.exports = {
 			return callback(e);
 		}
 	},
-	 //Save Scenario Training Info
-	 saveTrainingInfo: function (insertParams, callback) {
+	//Save Scenario Training Info
+	saveTrainingInfo: function (insertParams, callback) {
 		try {
 			const query = "UPDATE scenario SET LAST_TRAIN_DATE = NOW() WHERE SCENARIO_ID = ?";
-	
+
 			return pool.query(query, [insertParams.scenario_id], function (err, results) {
 				if (!err) {
 					return callback(null, results);
@@ -1513,7 +1513,37 @@ module.exports = {
 		} catch (e) {
 			return callback(e);
 		}
+	},
+	//Save nlp event detection information to played_nlp_events table
+	saveNlpPlay: function (nlpPlayDataRows, callback) {
+		try {
+			if (nlpPlayDataRows.length === 0) {
+				return callback(null, {
+					message: 'No data to save',
+					error: false
+				});
+			}
+			// Construct a query template for inserting data.
+			const query = `
+				INSERT INTO played_nlp_events
+				(PLAY_ID, SCENARIO_ROLE_ID, PREDICTED_TEXT, PREDICTED_EVENT_LOOKUP, LOOKUP_COUNTER,
+				PREDICTED_EVENT_NLP, FINAL_PREDICTED_EVENT, PREDICTED_EVENT_ID, TIME, TIMESTAMP)
+				VALUES ?`;
+
+			return pool.query(query, [nlpPlayDataRows], function (err, results) {
+				if (!err) {
+					return callback(null, results);
+				} else {
+					console.log(err);
+					return callback(err);
+				}
+			});
+		} catch (e) {
+			return callback(e);
+		}
+
 	}
-	
-	
+
+
+
 }

@@ -148,6 +148,9 @@ module.exports = function (app, passport) {
     //Save Scenario Training Info
     app.get('/saveTrainingInfo',DataRoute.saveTrainingInfo)
 
+    //Save nlp event detection information to played_nlp_events table
+    app.post('/saveNlpPlay',  DataRoute.saveNlpPlay);
+
 
 };
 

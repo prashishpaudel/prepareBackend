@@ -1295,9 +1295,7 @@ module.exports = {
 			var trainee = JSON.parse(inputdata.trainee);
 			var scenario_id = inputdata.scenario_id;
 			var nodes = JSON.parse(inputdata.nodes);
-			console.log(inputdata.trainee);
 			var comments = JSON.parse(inputdata.comments);
-
 			var createPlayParams = {
 				user_id: inputdata.user.id,
 				scenario_id: scenario_id
@@ -1389,6 +1387,7 @@ module.exports = {
 							if (!Array.isArray(deviceDetails) || (Array.isArray(deviceDetails) && deviceDetails.length == 0)) {
 								var send = {};
 								send.error = false;
+								send.play_id = play_id;
 								send.message = "Data Saved";
 								return callback(null, send);
 							}
@@ -1400,6 +1399,7 @@ module.exports = {
 								var send = {};
 								send.error = false;
 								send.message = "Data Saved";
+								send.play_id = play_id;
 								return callback(null, send);
 
 							});
@@ -1907,6 +1907,43 @@ module.exports = {
 				}
 				return callback(null, results);
 			});
+		} catch (e) {
+			console.log(e);
+			return callback(e);
+		}
+	},
+	//Save nlp event detection information to played_nlp_events table
+	saveNlpPlay: function (inputData, callback) {
+		try {
+			var nlpPlayDataRows = [];
+	
+			inputData.forEach(function (playData) {
+				var temp = [];
+				temp.push(playData.play_id);
+				temp.push(playData.scenario_role_id);
+				temp.push(playData.predicted_text);
+				temp.push(playData.predicted_event_lookup);
+				temp.push(JSON.stringify(playData.lookup_counter)); 
+				temp.push(playData.predicted_event_nlp);
+				temp.push(playData.final_predicted_event);
+				temp.push(playData.predicted_event_id);
+				temp.push(playData.time);
+				temp.push(playData.timestamp);
+	
+				nlpPlayDataRows.push(temp);
+			});
+	
+			return ScenarioModel.saveNlpPlay(nlpPlayDataRows, function (err, results) {
+				if (err) {
+					throw err;
+				}
+	
+				var send = {};
+				send.error = false;
+				send.message = "NLP Play Data Saved";
+				return callback(null, send);
+			});
+	
 		} catch (e) {
 			console.log(e);
 			return callback(e);

@@ -889,7 +889,10 @@ module.exports = {
 					if (err) {
 						throw err;
 					}
-					return response.json(data);
+					return response.json({
+						play_id:data.play_id,
+						message:data.message
+					});
 				});
 			} else {
 
@@ -1378,6 +1381,34 @@ module.exports = {
 			response.json(request.output);
 		}
 	},
+	 //Save nlp event detection information to played_nlp_events table
+	saveNlpPlay: function (request, response) {
+		try {
+			if (request && request.body) {
+				const nodes = request.body.data;
+				if (!nodes || !Array.isArray(nodes)) {
+					var err = new Error('nodes is not present in the request body or is not an array');
+					throw err;
+				}
+	
+				return ScenarioControllers.saveNlpPlay(nodes, function (err, data) {
+					if (err) {
+						throw err;
+					}
+					return response.json(data);
+					
+				});
+			} else {
+				var err = new Error('Request body is not present');
+				throw err;
+			}
+		} catch (e) {
+			request.output = {}
+			request.output.error = true;
+			request.output.message = e.message;
+			response.json(request.output);
+		}
+	}
 	
 
 }
