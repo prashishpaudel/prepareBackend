@@ -276,8 +276,7 @@ module.exports = {
 		try {
 
 
-			query = "SELECT pe.*, e.OBJECTIVES as obj1, e.*, sc.SCENARIO_NAME, pt.LEARNER_ID, pt.SERIALNUMBER FROM prepare.played_events pe left join prepare.events e on e.event_id = pe.event_id left join prepare.scenario sc on sc.scenario_id = e.scenario_id left join prepare.plays_trainee pt on pt.PLAY_ID=pe.PLAY_ID where pe.play_id in (SELECT PLAY_ID FROM prepare.plays where scenario_id in (select scenario_id from prepare.scenario where course_id=?));"
-
+			query = "SELECT pe.*, pn.TIMESTAMP AS 'NLP_TIMESTAMP', CASE WHEN pn.TIMESTAMP <> '' THEN TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(pn.TIMESTAMP / 1000), FROM_UNIXTIME(pe.TIMESTAMP / 1000)) ELSE NULL END AS 'TIME_DIFF_SECONDS(INSTRUCTOR TIME - NLP TIME)', e.OBJECTIVES AS obj1, e.*, sc.SCENARIO_NAME, pt.LEARNER_ID, pt.SERIALNUMBER FROM prepare.played_events pe LEFT JOIN prepare.events e ON e.event_id = pe.event_id LEFT JOIN prepare.scenario sc ON sc.scenario_id = e.scenario_id LEFT JOIN prepare.plays_trainee pt ON pt.PLAY_ID = pe.PLAY_ID LEFT JOIN played_nlp_events pn ON pn.PLAY_ID = pe.PLAY_ID AND pn.PREDICTED_EVENT_ID = pe.event_id WHERE pe.play_id IN (SELECT PLAY_ID FROM prepare.plays WHERE scenario_id IN (SELECT scenario_id FROM prepare.scenario WHERE course_id = 48));"
 			return pool.query(query, [inputparams.courseId], function (err, results) {
 
 
@@ -301,7 +300,6 @@ module.exports = {
 
 
 			query = "SELECT pe.*, e.OBJECTIVES as obj1, e.*, sc.SCENARIO_NAME, pt.LEARNER_ID FROM prepare.played_events pe left join prepare.events e on e.event_id = pe.event_id left join prepare.scenario sc on sc.scenario_id = e.scenario_id left join prepare.plays_trainee pt on pt.PLAY_ID=pe.PLAY_ID where pe.play_id in (SELECT PLAY_ID FROM prepare.plays where scenario_id in (select scenario_id from prepare.scenario where course_id=?)) and pt.LEARNER_ID in (?);"
-
 			return pool.query(query, [inputparams.courseId, inputparams.learner_ids], function (err, results) {
 
 
