@@ -1233,7 +1233,7 @@ module.exports = {
 	speceficResults: function (inputdata, callback) {
 		try {
 
-			query = "SELECT s.SCENARIO_NAME,s.CATEGORY,CONCAT(u.fname, ' ', u.lname) AS 'Observer Name',CONCAT(pt.TRAINEE_F_NAME, ' ', pt.TRAINEE_L_NAME) AS 'TRAINEE Name',pt.TRAINEE_L_NAME AS lname, pt.DEVICECONNECTTIME, pt.SERIALNUMBER, e.EVENT_NAME,e.SKILL_TYPE,e.SPECIFIC_SKILL,e.HEART_RATE,e.SYSTOLIC_BP,e.DISTOLIC_BP AS DISTOLIC_BP,e.SPO2,R_RATE,e.CARDIAC_RYTHM,pe.POINTS, pe.TIMESTAMP, pe.TIME, pe.ID FROM  played_events pe LEFT JOIN plays p ON p.PLAY_ID = pe.PLAY_ID LEFT JOIN plays_trainee pt on pt.PLAY_ID=pe.PLAY_ID LEFT JOIN users u ON u.id = p.user_id LEFT JOIN scenario s ON s.scenario_id = p.scenario_id LEFT JOIN events e ON e.event_id = pe.event_id WHERE p.PLAY_ID =? and pt.TRAINEE_L_NAME=?"
+			query = "SELECT s.SCENARIO_NAME,s.CATEGORY,CONCAT(u.fname, ' ', u.lname) AS 'Observer Name',CONCAT(pt.TRAINEE_F_NAME, ' ', pt.TRAINEE_L_NAME) AS 'TRAINEE Name',pt.TRAINEE_L_NAME AS lname, pt.DEVICECONNECTTIME, pt.SERIALNUMBER, e.EVENT_NAME,e.SKILL_TYPE,e.SPECIFIC_SKILL,e.HEART_RATE,e.SYSTOLIC_BP,e.DISTOLIC_BP AS DISTOLIC_BP,e.SPO2,R_RATE,e.CARDIAC_RYTHM,pe.POINTS, pe.TIMESTAMP, pe.TIME, pe.ID, pn.TIMESTAMP AS 'NLP_TIMESTAMP', pn.PREDICTED_TEXT FROM  played_events pe LEFT JOIN plays p ON p.PLAY_ID = pe.PLAY_ID LEFT JOIN plays_trainee pt on pt.PLAY_ID=pe.PLAY_ID LEFT JOIN users u ON u.id = p.user_id LEFT JOIN scenario s ON s.scenario_id = p.scenario_id LEFT JOIN events e ON e.event_id = pe.event_id LEFT JOIN played_nlp_events pn ON pn.PLAY_ID = pe.PLAY_ID AND pn.PREDICTED_EVENT_ID = pe.event_id WHERE p.PLAY_ID =? and pt.TRAINEE_L_NAME=?"
 			return pool.query(query, [inputdata.play_id, inputdata.lastname], function (err, results) {
 
 				if (!err) {

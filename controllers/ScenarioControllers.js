@@ -1596,6 +1596,7 @@ module.exports = {
 												output.histEventsDetails = histEventsDetails;
 												output.vidList = vidList;
 												output.connectedDevices = connectedDevices;
+												console.log('This is the output of playOutput',events)
 												return callback(null, output);
 
 											});
