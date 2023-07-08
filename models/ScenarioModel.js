@@ -276,7 +276,7 @@ module.exports = {
 		try {
 
 
-			query = "SELECT pe.*, pn.TIMESTAMP AS 'NLP_TIMESTAMP', CASE WHEN pn.TIMESTAMP <> '' THEN TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(pn.TIMESTAMP / 1000), FROM_UNIXTIME(pe.TIMESTAMP / 1000)) ELSE NULL END AS 'TIME_DIFF_SECONDS(INSTRUCTOR TIME - NLP TIME)', e.OBJECTIVES AS obj1, e.*, sc.SCENARIO_NAME, pt.LEARNER_ID, pt.SERIALNUMBER FROM prepare.played_events pe LEFT JOIN prepare.events e ON e.event_id = pe.event_id LEFT JOIN prepare.scenario sc ON sc.scenario_id = e.scenario_id LEFT JOIN prepare.plays_trainee pt ON pt.PLAY_ID = pe.PLAY_ID LEFT JOIN played_nlp_events pn ON pn.PLAY_ID = pe.PLAY_ID AND pn.PREDICTED_EVENT_ID = pe.event_id WHERE pe.play_id IN (SELECT PLAY_ID FROM prepare.plays WHERE scenario_id IN (SELECT scenario_id FROM prepare.scenario WHERE course_id = 48));"
+			query = "SELECT pe.*, pn.TIMESTAMP AS 'NLP_TIMESTAMP', CASE WHEN pn.TIMESTAMP <> '' THEN TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(pn.TIMESTAMP / 1000), FROM_UNIXTIME(pe.TIMESTAMP / 1000)) ELSE NULL END AS 'TIME_DIFF_SECONDS(INSTRUCTOR TIME - NLP TIME)', e.OBJECTIVES AS obj1, e.*, sc.SCENARIO_NAME, pt.LEARNER_ID, pt.SERIALNUMBER FROM prepare.played_events pe LEFT JOIN prepare.events e ON e.event_id = pe.event_id LEFT JOIN prepare.scenario sc ON sc.scenario_id = e.scenario_id LEFT JOIN prepare.plays_trainee pt ON pt.PLAY_ID = pe.PLAY_ID LEFT JOIN played_nlp_events pn ON pn.PLAY_ID = pe.PLAY_ID AND pn.PREDICTED_EVENT_ID = pe.event_id WHERE pe.play_id IN (SELECT PLAY_ID FROM prepare.plays WHERE scenario_id IN (SELECT scenario_id FROM prepare.scenario WHERE course_id = ?));"
 			return pool.query(query, [inputparams.courseId], function (err, results) {
 
 
