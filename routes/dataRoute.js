@@ -1106,7 +1106,7 @@ module.exports = {
 	addEvent: function (req, res) {
 		try {
 			if (req && req.body) {
-				var requiredFields = ['eventname', 'skilltype', 'specificskill', 'timestart', 'scenario_id', 'heart_rate', 'systolic_bp', 'diastolic_bp', 'spo2', 'r_rate', 'cardiac_rhythm', 'scenario_role_id', 'objectives1'];
+				var requiredFields = ['eventname', 'skilltype', 'specificskill', 'timestart', 'scenario_id', 'heart_rate', 'systolic_bp', 'diastolic_bp', 'spo2', 'r_rate', 'cardiac_rhythm', 'scenario_role_id', 'objectives1','event_timeout','event_penalty_coefficient'];
 
 				// check if all required fields are present
 				requiredFields.forEach(function (str) {

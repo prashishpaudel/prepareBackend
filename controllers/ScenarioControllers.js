@@ -1371,6 +1371,7 @@ module.exports = {
 							temp.push(node.completedTime);
 							temp.push(node.time);
 							temp.push(node.skillLevel);
+							temp.push(node.automatedInstructorScore);
 
 
 							insertPlayedEventsParams.push(temp);
@@ -1930,6 +1931,7 @@ module.exports = {
 				temp.push(playData.predicted_event_id);
 				temp.push(playData.time);
 				temp.push(playData.timestamp);
+				temp.push(playData.automatedNLPScore);
 	
 				nlpPlayDataRows.push(temp);
 			});

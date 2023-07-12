@@ -276,7 +276,7 @@ module.exports = {
 		try {
 
 
-			query = "SELECT pe.*, pn.TIMESTAMP AS 'NLP_TIMESTAMP', CASE WHEN pn.TIMESTAMP <> '' THEN TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(pn.TIMESTAMP / 1000), FROM_UNIXTIME(pe.TIMESTAMP / 1000)) ELSE NULL END AS 'TIME_DIFF_SECONDS(INSTRUCTOR TIME - NLP TIME)', e.OBJECTIVES AS obj1, e.*, sc.SCENARIO_NAME, pt.LEARNER_ID, pt.SERIALNUMBER FROM prepare.played_events pe LEFT JOIN prepare.events e ON e.event_id = pe.event_id LEFT JOIN prepare.scenario sc ON sc.scenario_id = e.scenario_id LEFT JOIN prepare.plays_trainee pt ON pt.PLAY_ID = pe.PLAY_ID LEFT JOIN played_nlp_events pn ON pn.PLAY_ID = pe.PLAY_ID AND pn.PREDICTED_EVENT_ID = pe.event_id WHERE pe.play_id IN (SELECT PLAY_ID FROM prepare.plays WHERE scenario_id IN (SELECT scenario_id FROM prepare.scenario WHERE course_id = ?));"
+			query = "SELECT pe.*, pn.TIMESTAMP AS 'NLP_TIMESTAMP', CASE WHEN pn.TIMESTAMP <> '' THEN TIMESTAMPDIFF(SECOND, FROM_UNIXTIME(pn.TIMESTAMP / 1000), FROM_UNIXTIME(pe.TIMESTAMP / 1000)) ELSE NULL END AS 'TIME_DIFF_SECONDS(INSTRUCTOR TIME - NLP TIME)',pn.AUTOMATED_NLP_SCORE, e.OBJECTIVES AS obj1, e.*, sc.SCENARIO_NAME, pt.LEARNER_ID, pt.SERIALNUMBER FROM prepare.played_events pe LEFT JOIN prepare.events e ON e.event_id = pe.event_id LEFT JOIN prepare.scenario sc ON sc.scenario_id = e.scenario_id LEFT JOIN prepare.plays_trainee pt ON pt.PLAY_ID = pe.PLAY_ID LEFT JOIN played_nlp_events pn ON pn.PLAY_ID = pe.PLAY_ID AND pn.PREDICTED_EVENT_ID = pe.event_id WHERE pe.play_id IN (SELECT PLAY_ID FROM prepare.plays WHERE scenario_id IN (SELECT scenario_id FROM prepare.scenario WHERE course_id = ?));"
 			return pool.query(query, [inputparams.courseId], function (err, results) {
 
 
@@ -849,7 +849,7 @@ module.exports = {
 	insertPlayedEvents: function (inputdata, callback) {
 		try {
 
-			query = "INSERT INTO played_events (PLAY_ID, EVENT_ID,POINTS,SCENARIO_ROLE_ID, TIMESTAMP,TIME,SKILL_LEVEL) VALUES ?";
+			query = "INSERT INTO played_events (PLAY_ID, EVENT_ID,POINTS,SCENARIO_ROLE_ID, TIMESTAMP,TIME,SKILL_LEVEL,AUTOMATED_INSTRCUTOR_SCORE) VALUES ?";
 
 
 			return pool.query(query, [inputdata], function (err, results) {
@@ -1003,8 +1003,8 @@ module.exports = {
 
 			console.log(inputdata.objectives);
 
-			var query = "INSERT INTO events (SCENARIO_ID, EVENT_NAME, TIME_START, SKILL_TYPE, SPECIFIC_SKILL,HEART_RATE,SYSTOLIC_BP,DISTOLIC_BP,SPO2,R_RATE,CARDIAC_RYTHM,SCENARIO_ROLE_ID,OBJECTIVES,LOOKUP_WORDS_SYNONYMS) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
-			return pool.query(query, [inputdata.scenario_id, inputdata.eventname, inputdata.timestart, inputdata.skilltype, inputdata.specificskill, inputdata.heart_rate, inputdata.systolic_bp, inputdata.diastolic_bp, inputdata.spo2, inputdata.r_rate, inputdata.cardiac_rhythm, inputdata.scenario_role_id, inputdata.objectives1, inputdata.lookupSynonyms], function (err, results) {
+			var query = "INSERT INTO events (SCENARIO_ID, EVENT_NAME, TIME_START, SKILL_TYPE, SPECIFIC_SKILL,HEART_RATE,SYSTOLIC_BP,DISTOLIC_BP,SPO2,R_RATE,CARDIAC_RYTHM,SCENARIO_ROLE_ID,OBJECTIVES,LOOKUP_WORDS_SYNONYMS,EVENT_TIMEOUT, EVENT_PENALTY_COEFFICIENT) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+			return pool.query(query, [inputdata.scenario_id, inputdata.eventname, inputdata.timestart, inputdata.skilltype, inputdata.specificskill, inputdata.heart_rate, inputdata.systolic_bp, inputdata.diastolic_bp, inputdata.spo2, inputdata.r_rate, inputdata.cardiac_rhythm, inputdata.scenario_role_id, inputdata.objectives1, inputdata.lookupSynonyms,inputdata.event_timeout,inputdata.event_penalty_coefficient], function (err, results) {
 
 				if (!err) {
 					var ress = {
@@ -1231,7 +1231,7 @@ module.exports = {
 	speceficResults: function (inputdata, callback) {
 		try {
 
-			query = "SELECT s.SCENARIO_NAME,s.CATEGORY,CONCAT(u.fname, ' ', u.lname) AS 'Observer Name',CONCAT(pt.TRAINEE_F_NAME, ' ', pt.TRAINEE_L_NAME) AS 'TRAINEE Name',pt.TRAINEE_L_NAME AS lname, pt.DEVICECONNECTTIME, pt.SERIALNUMBER, e.EVENT_NAME,e.SKILL_TYPE,e.SPECIFIC_SKILL,e.HEART_RATE,e.SYSTOLIC_BP,e.DISTOLIC_BP AS DISTOLIC_BP,e.SPO2,R_RATE,e.CARDIAC_RYTHM,pe.POINTS, pe.TIMESTAMP, pe.TIME, pe.ID, pn.TIMESTAMP AS 'NLP_TIMESTAMP', pn.PREDICTED_TEXT FROM  played_events pe LEFT JOIN plays p ON p.PLAY_ID = pe.PLAY_ID LEFT JOIN plays_trainee pt on pt.PLAY_ID=pe.PLAY_ID LEFT JOIN users u ON u.id = p.user_id LEFT JOIN scenario s ON s.scenario_id = p.scenario_id LEFT JOIN events e ON e.event_id = pe.event_id LEFT JOIN played_nlp_events pn ON pn.PLAY_ID = pe.PLAY_ID AND pn.PREDICTED_EVENT_ID = pe.event_id WHERE p.PLAY_ID =? and pt.TRAINEE_L_NAME=?"
+			query = "SELECT s.SCENARIO_NAME,s.CATEGORY,CONCAT(u.fname, ' ', u.lname) AS 'Observer Name',CONCAT(pt.TRAINEE_F_NAME, ' ', pt.TRAINEE_L_NAME) AS 'TRAINEE Name',pt.TRAINEE_L_NAME AS lname, pt.DEVICECONNECTTIME, pt.SERIALNUMBER, e.EVENT_NAME,e.SKILL_TYPE,e.SPECIFIC_SKILL,e.HEART_RATE,e.SYSTOLIC_BP,e.DISTOLIC_BP AS DISTOLIC_BP,e.SPO2,R_RATE,e.CARDIAC_RYTHM,pe.POINTS, pe.TIMESTAMP, pe.TIME, pe.ID, pe.AUTOMATED_INSTRCUTOR_SCORE,pn.AUTOMATED_NLP_SCORE,pn.TIMESTAMP AS 'NLP_TIMESTAMP', pn.PREDICTED_TEXT FROM  played_events pe LEFT JOIN plays p ON p.PLAY_ID = pe.PLAY_ID LEFT JOIN plays_trainee pt on pt.PLAY_ID=pe.PLAY_ID LEFT JOIN users u ON u.id = p.user_id LEFT JOIN scenario s ON s.scenario_id = p.scenario_id LEFT JOIN events e ON e.event_id = pe.event_id LEFT JOIN played_nlp_events pn ON pn.PLAY_ID = pe.PLAY_ID AND pn.PREDICTED_EVENT_ID = pe.event_id WHERE p.PLAY_ID =? and pt.TRAINEE_L_NAME=?"
 			return pool.query(query, [inputdata.play_id, inputdata.lastname], function (err, results) {
 
 				if (!err) {
@@ -1525,7 +1525,7 @@ module.exports = {
 			const query = `
 				INSERT INTO played_nlp_events
 				(PLAY_ID, SCENARIO_ROLE_ID, PREDICTED_TEXT, PREDICTED_EVENT_LOOKUP, LOOKUP_COUNTER,
-				PREDICTED_EVENT_NLP, FINAL_PREDICTED_EVENT, PREDICTED_EVENT_ID, TIME, TIMESTAMP)
+				PREDICTED_EVENT_NLP, FINAL_PREDICTED_EVENT, PREDICTED_EVENT_ID, TIME, TIMESTAMP, AUTOMATED_NLP_SCORE)
 				VALUES ?`;
 
 			return pool.query(query, [nlpPlayDataRows], function (err, results) {
